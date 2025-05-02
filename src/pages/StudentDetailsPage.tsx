@@ -89,7 +89,7 @@ const StudentDetailsPage = () => {
         <Card className="p-6 neuro-card">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-xl font-semibold">Student Number: {studentData.studentNumber || studentData.id}</h2>
+              <h2 className="text-xl font-semibold">Student Number: {studentData.id || studentData.regNumber}</h2>
               <p className="text-muted-foreground">Registration Number: {studentData.regNumber}</p>
             </div>
             <Badge variant={isPermitValid ? "default" : "destructive"}>

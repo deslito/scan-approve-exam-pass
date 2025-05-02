@@ -34,7 +34,7 @@ const generateMockPermits = () => {
       studentId: student.studentNumber,
       studentNumber: student.studentNumber,
       enrolledCourseUnit: courseUnits[index % courseUnits.length],
-      status: "valid",
+      status: "approved",
       expiryDate: "2025-05-30",
       approvedBy: invigilators[index % invigilators.length],
       approvedTime: "2025-05-10 10:30 AM"
@@ -101,13 +101,13 @@ const ManagePermitsPage = () => {
             <Tabs defaultValue="all">
               <TabsList className="grid grid-cols-2">
                 <TabsTrigger value="all">All</TabsTrigger>
-                <TabsTrigger value="valid">Valid</TabsTrigger>
+                <TabsTrigger value="approved">Approved</TabsTrigger>
               </TabsList>
               <TabsContent value="all" className="mt-4">
                 <PermitsTable permits={filteredPermits} />
               </TabsContent>
-              <TabsContent value="valid" className="mt-4">
-                <PermitsTable permits={filteredPermits.filter((p) => p.status === "valid")} />
+              <TabsContent value="approved" className="mt-4">
+                <PermitsTable permits={filteredPermits.filter((p) => p.status === "approved")} />
               </TabsContent>
             </Tabs>
           </div>
@@ -121,7 +121,7 @@ const ManagePermitsPage = () => {
 const StatusBadge = ({ status }: { status: string }) => {
   const getStatusClasses = () => {
     switch (status) {
-      case "valid":
+      case "approved":
         return "bg-green-100 text-green-800";
       case "invalid":
         return "bg-red-100 text-red-800";
