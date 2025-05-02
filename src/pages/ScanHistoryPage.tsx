@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NavBar from "@/components/NavBar";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Search, Calendar, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { studentData } from "@/types/studentData";
+import { format } from "date-fns";
 
 // Create mock scan history data using student data
 const createMockScans = () => {
@@ -67,8 +67,12 @@ const ScanHistoryPage = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString();
+    try {
+      const date = new Date(dateString);
+      return format(date, "MMM d, yyyy 'at' h:mm a");
+    } catch (error) {
+      return "Date not available";
+    }
   };
 
   return (
