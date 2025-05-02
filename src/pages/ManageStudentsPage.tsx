@@ -5,56 +5,24 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
 import AdminSidebar from "@/components/AdminSidebar";
-
-// Simplified mock student data with only registration number and student number
-const mockStudents = [
-  {
-    id: "S123456",
-    studentNumber: "2300804387",
-    regNumber: "23/U/DCE/04387/PD",
-    permitStatus: "VALID"
-  },
-  {
-    id: "S234567",
-    studentNumber: "2100038005",
-    regNumber: "21/U/ARC/38005/PD",
-    permitStatus: "VALID"
-  },
-  {
-    id: "S345678",
-    studentNumber: "2100003925",
-    regNumber: "21/U/ITD/3925/PD",
-    permitStatus: "VALID"
-  },
-  {
-    id: "S456789",
-    studentNumber: "2100003345",
-    regNumber: "21/U/BBA/3345/PD",
-    permitStatus: "VALID"
-  }
-];
+import { studentData } from "@/types/studentData";
 
 const ManageStudentsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [students, setStudents] = useState(mockStudents);
+  const [students, setStudents] = useState(studentData);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Search by registration number or student number
     if (searchTerm) {
-      const filteredStudents = mockStudents.filter(student => 
-        student.regNumber.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      const filteredStudents = studentData.filter(student => 
+        student.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) || 
         student.studentNumber.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setStudents(filteredStudents);
     } else {
-      setStudents(mockStudents);
+      setStudents(studentData);
     }
-  };
-
-  // Get color for permit status badge
-  const getStatusColor = (status: string) => {
-    return status === "VALID" ? "bg-green-500" : "bg-destructive";
   };
 
   return (
@@ -80,15 +48,15 @@ const ManageStudentsPage = () => {
           
           <div className="space-y-4">
             {students.map((student) => (
-              <Card key={student.id} className="p-4 neuro-card">
+              <Card key={student.studentNumber} className="p-4 neuro-card">
                 <div className="flex justify-between items-center">
                   <div>
-                    <div className="text-sm font-medium mb-1">Reg Number: {student.regNumber}</div>
+                    <div className="text-sm font-medium mb-1">Reg Number: {student.registrationNumber}</div>
                     <div className="text-sm">Student Number: {student.studentNumber}</div>
                   </div>
                   <div>
-                    <Badge className={getStatusColor(student.permitStatus)}>
-                      {student.permitStatus}
+                    <Badge className="bg-green-500">
+                      VALID
                     </Badge>
                   </div>
                 </div>

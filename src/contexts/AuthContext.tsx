@@ -1,8 +1,40 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { studentData } from "@/types/studentData";
+
+// Convert student data to the format expected by the auth context
+const createStudentUsers = () => {
+  const students: Record<string, any> = {};
+  
+  studentData.forEach(student => {
+    const email = `${student.firstName.toLowerCase()}${student.lastName.toLowerCase()}@example.com`;
+    students[email] = {
+      id: student.studentNumber,
+      name: `${student.firstName} ${student.lastName}`,
+      regNumber: student.registrationNumber,
+      email: email,
+      role: "student" as const,
+      semester: "I",
+      yearOfStudy: 2,
+      course: "Bachelor of Information Technology",
+      gender: student.gender,
+      programme: "Day",
+      feesBalance: 0, // All have cleared fees
+      permitStatus: "VALID",
+      photoUrl: student.gender === "Male" 
+        ? "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"
+        : "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+      faculty: "Science and Technology",
+      department: "Information Technology"
+    };
+  });
+  
+  return students;
+};
 
 // Mock data for students
 const mockStudents = {
+  ...createStudentUsers(),
   "asiimiretracy@gmail.com": {
     id: "S123456",
     name: "Asiimire Tracy",
@@ -14,8 +46,8 @@ const mockStudents = {
     course: "Bachelor of Computer Science",
     gender: "Female",
     programme: "Day",
-    feesBalance: 500000,
-    permitStatus: "INVALID",
+    feesBalance: 0, // Changed to 0 (cleared fees)
+    permitStatus: "VALID",
     photoUrl: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7",
     faculty: "Science and Technology",
     department: "Computer Science"

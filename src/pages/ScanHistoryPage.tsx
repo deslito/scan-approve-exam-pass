@@ -1,10 +1,11 @@
+
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NavBar from "@/components/NavBar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Search, Calendar, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -13,45 +14,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { studentData } from "@/types/studentData";
 
-const mockScans = [
-  {
-    id: "SC001",
-    studentName: "Asiimire Tracy",
-    regNumber: "23/U/DCE/04387/PD",
-    scanTime: "2023-06-01T09:15:00Z",
-    course: "Advanced Mathematics",
-    permitStatus: "INVALID",
-    action: "DENIED"
-  },
-  {
-    id: "SC002",
-    studentName: "Muyingo Cynthia",
-    regNumber: "21/U/ARC/38005/PD",
-    scanTime: "2023-06-01T10:22:00Z",
-    course: "Physics 101",
-    permitStatus: "EXPIRED",
-    action: "DENIED"
-  },
-  {
-    id: "SC003",
-    studentName: "Twijukye David",
-    regNumber: "21/U/BBA/3345/PD",
-    scanTime: "2023-06-02T08:45:00Z",
-    course: "Computer Science",
-    permitStatus: "PENDING",
-    action: "DENIED"
-  },
-  {
-    id: "SC004",
-    studentName: "Mubiru Timothy",
-    regNumber: "21/U/ITD/3925/PD",
-    scanTime: "2023-06-02T13:10:00Z",
-    course: "Business Administration",
-    permitStatus: "APPROVED",
-    action: "ALLOWED"
-  }
-];
+// Create mock scan history data using student data
+const createMockScans = () => {
+  return studentData.slice(0, 10).map((student, index) => {
+    return {
+      id: `SC00${index + 1}`,
+      studentNumber: student.studentNumber,
+      regNumber: student.registrationNumber,
+      scanTime: `2025-05-${(index % 5) + 1}T${9 + (index % 8)}:${(index * 7) % 60}:00Z`,
+      course: "Data Structures",
+      permitStatus: "APPROVED",
+      action: "ALLOWED"
+    };
+  });
+};
+
+const mockScans = createMockScans();
 
 const ScanHistoryPage = () => {
   const { user } = useAuth();
@@ -69,7 +49,7 @@ const ScanHistoryPage = () => {
     
     if (search) {
       filtered = filtered.filter(scan => 
-        scan.studentName.toLowerCase().includes(search.toLowerCase()) || 
+        scan.studentNumber.toLowerCase().includes(search.toLowerCase()) || 
         scan.regNumber.toLowerCase().includes(search.toLowerCase())
       );
     }
@@ -84,12 +64,6 @@ const ScanHistoryPage = () => {
   const handleFilterChange = (value: string) => {
     setFilter(value);
     filterScans(searchTerm, value);
-  };
-  
-  const getActionIcon = (action: string) => {
-    return action === "ALLOWED" ? 
-      <CheckCircle className="w-4 h-4 text-green-500" /> : 
-      <XCircle className="w-4 h-4 text-red-500" />;
   };
 
   const formatDate = (dateString: string) => {
@@ -124,7 +98,6 @@ const ScanHistoryPage = () => {
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="allowed">Allowed</SelectItem>
-              <SelectItem value="denied">Denied</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -139,7 +112,7 @@ const ScanHistoryPage = () => {
               <Card key={scan.id} className="p-4 neuro-card">
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="font-semibold">{scan.studentName}</div>
+                    <div className="font-semibold">Student Number: {scan.studentNumber}</div>
                     <div className="text-sm text-muted-foreground">{scan.regNumber}</div>
                     <div className="text-sm">{scan.course}</div>
                     <div className="flex items-center text-xs text-muted-foreground mt-2">
@@ -148,15 +121,12 @@ const ScanHistoryPage = () => {
                     </div>
                   </div>
                   <div className="flex flex-col items-end space-y-2">
-                    <Badge 
-                      variant={scan.permitStatus === "VALID" ? "default" : 
-                             scan.permitStatus === "PENDING" ? "outline" : "destructive"}
-                    >
+                    <Badge variant="default">
                       {scan.permitStatus}
                     </Badge>
                     <div className="flex items-center">
-                      {getActionIcon(scan.action)}
-                      <span className={`ml-1 text-xs font-medium ${scan.action === "ALLOWED" ? "text-green-600" : "text-red-600"}`}>
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="ml-1 text-xs font-medium text-green-600">
                         {scan.action}
                       </span>
                     </div>

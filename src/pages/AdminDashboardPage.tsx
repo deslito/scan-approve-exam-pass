@@ -14,9 +14,7 @@ const AdminDashboardPage = () => {
   // Mock data
   const stats = {
     totalStudents: 2458,
-    pendingPermits: 125,
-    validPermits: 2000,
-    expiredPermits: 458,
+    validPermits: 2458,
     verifiedToday: 200,
   };
 
@@ -48,9 +46,7 @@ const AdminDashboardPage = () => {
   ];
 
   const statusDistribution = {
-    approved: Math.round((stats.validPermits / stats.totalStudents) * 100),
-    pending: Math.round((stats.pendingPermits / stats.totalStudents) * 100),
-    expired: Math.round((stats.expiredPermits / stats.totalStudents) * 100),
+    approved: 100,
   };
 
   return (
@@ -75,9 +71,9 @@ const AdminDashboardPage = () => {
                   icon={<Users className="w-8 h-8 text-university-blue" />}
                 />
                 <StatCard
-                  title="Pending Permits"
-                  value={stats.pendingPermits.toString()}
-                  icon={<AlertCircle className="w-8 h-8 text-amber-500" />}
+                  title="Valid Permits"
+                  value={stats.validPermits.toString()}
+                  icon={<CreditCard className="w-8 h-8 text-green-500" />}
                 />
               </div>
             </div>
@@ -95,16 +91,6 @@ const AdminDashboardPage = () => {
                       label="Approved"
                       value={statusDistribution.approved}
                       color="bg-permit-valid"
-                    />
-                    <StatusProgressBar
-                      label="Pending"
-                      value={statusDistribution.pending}
-                      color="bg-permit-pending"
-                    />
-                    <StatusProgressBar
-                      label="Expired"
-                      value={statusDistribution.expired}
-                      color="bg-permit-expired"
                     />
                   </div>
                 </CardContent>

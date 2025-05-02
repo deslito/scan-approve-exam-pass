@@ -8,71 +8,64 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminSidebar from "@/components/AdminSidebar";
+import { studentData } from "@/types/studentData";
+
+// Create mock permit data based on student data
+const generateMockPermits = () => {
+  const courseUnits = [
+    "Advanced Programming",
+    "Database Systems",
+    "Computer Networks",
+    "Data Structures",
+    "Operating Systems",
+    "Software Engineering",
+    "Web Development",
+    "Artificial Intelligence"
+  ];
+
+  const invigilators = [
+    "Dr. Mugisha Joel",
+    "Ms. Nakirayi Sophia"
+  ];
+
+  return studentData.slice(0, 15).map((student, index) => {
+    return {
+      id: `P${index + 1}`,
+      studentId: student.studentNumber,
+      studentNumber: student.studentNumber,
+      enrolledCourseUnit: courseUnits[index % courseUnits.length],
+      status: "valid",
+      expiryDate: "2025-05-30",
+      approvedBy: invigilators[index % invigilators.length],
+      approvedTime: "2025-05-10 10:30 AM"
+    };
+  });
+};
+
+const permits = generateMockPermits();
 
 const ManagePermitsPage = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Enhanced mock data with invigilator information
-  const permits = [
-    {
-      id: "P001",
-      studentId: "S123",
-      studentName: "Asiimire Tracy",
-      regNumber: "23/U/DCE/04387/PD",
-      course: "Advanced Mathematics",
-      status: "valid",
-      expiryDate: "2023-06-15",
-      approvedBy: "Dr. John Doe",
-      approvedTime: "2023-05-10 10:30 AM",
-      examRoom: "Block A, Room 203"
-    },
-    {
-      id: "P002",
-      studentId: "S456",
-      studentName: "Jane Smith",
-      regNumber: "UNI/2023/002",
-      course: "Physics 101",
-      status: "pending",
-      expiryDate: "2023-06-18",
-      approvedBy: "Prof. Sarah Williams",
-      approvedTime: "2023-05-11 09:15 AM",
-      examRoom: "Block B, Room 105"
-    },
-    {
-      id: "P003",
-      studentId: "S789",
-      studentName: "Robert Johnson",
-      regNumber: "UNI/2023/003",
-      course: "Computer Science",
-      status: "expired",
-      expiryDate: "2023-05-30",
-      approvedBy: "Dr. Michael Brown",
-      approvedTime: "2023-05-12 11:45 AM",
-      examRoom: "Block C, Room 301"
-    },
-    {
-      id: "P004",
-      studentId: "S012",
-      studentName: "Mary Williams",
-      regNumber: "UNI/2023/004",
-      course: "Biology",
-      status: "valid",
-      expiryDate: "2023-06-20",
-      approvedBy: "Prof. Elizabeth Taylor",
-      approvedTime: "2023-05-13 14:20 PM",
-      examRoom: "Block A, Room 205"
-    },
-  ];
+  const [filteredPermits, setFilteredPermits] = useState(permits);
 
   // Filter permits based on search term
-  const filteredPermits = permits.filter(
-    (permit) =>
-      permit.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      permit.regNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      permit.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      permit.approvedBy.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+    
+    if (term) {
+      const filtered = permits.filter(
+        (permit) =>
+          permit.studentNumber.toLowerCase().includes(term.toLowerCase()) ||
+          permit.enrolledCourseUnit.toLowerCase().includes(term.toLowerCase()) ||
+          permit.approvedBy.toLowerCase().includes(term.toLowerCase())
+      );
+      setFilteredPermits(filtered);
+    } else {
+      setFilteredPermits(permits);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -96,7 +89,7 @@ const ManagePermitsPage = () => {
                   placeholder="Search permits or invigilators..."
                   className="pl-8"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={handleSearch}
                 />
               </div>
               <Button variant="outline" size="icon">
@@ -106,23 +99,15 @@ const ManagePermitsPage = () => {
 
             {/* Tabs */}
             <Tabs defaultValue="all">
-              <TabsList className="grid grid-cols-4">
+              <TabsList className="grid grid-cols-2">
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="valid">Valid</TabsTrigger>
-                <TabsTrigger value="pending">Pending</TabsTrigger>
-                <TabsTrigger value="expired">Expired</TabsTrigger>
               </TabsList>
               <TabsContent value="all" className="mt-4">
                 <PermitsTable permits={filteredPermits} />
               </TabsContent>
               <TabsContent value="valid" className="mt-4">
                 <PermitsTable permits={filteredPermits.filter((p) => p.status === "valid")} />
-              </TabsContent>
-              <TabsContent value="pending" className="mt-4">
-                <PermitsTable permits={filteredPermits.filter((p) => p.status === "pending")} />
-              </TabsContent>
-              <TabsContent value="expired" className="mt-4">
-                <PermitsTable permits={filteredPermits.filter((p) => p.status === "expired")} />
               </TabsContent>
             </Tabs>
           </div>
@@ -138,9 +123,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     switch (status) {
       case "valid":
         return "bg-green-100 text-green-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "expired":
+      case "invalid":
         return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
@@ -156,18 +139,16 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-// Permits table component with invigilator information
+// Permits table component
 interface Permit {
   id: string;
   studentId: string;
-  studentName: string;
-  regNumber: string;
-  course: string;
+  studentNumber: string;
+  enrolledCourseUnit: string;
   status: string;
   expiryDate: string;
   approvedBy: string;
   approvedTime: string;
-  examRoom: string;
 }
 
 const PermitsTable = ({ permits }: { permits: Permit[] }) => {
@@ -176,32 +157,28 @@ const PermitsTable = ({ permits }: { permits: Permit[] }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Student</TableHead>
-            <TableHead>Reg Number</TableHead>
-            <TableHead>Course</TableHead>
+            <TableHead>Student No.</TableHead>
+            <TableHead>Enrolled Course Unit</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Approved By</TableHead>
-            <TableHead>Exam Room</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {permits.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={4} className="text-center py-4">
                 No permits found.
               </TableCell>
             </TableRow>
           ) : (
             permits.map((permit) => (
               <TableRow key={permit.id} className="hover:bg-muted/50">
-                <TableCell className="font-medium">{permit.studentName}</TableCell>
-                <TableCell>{permit.regNumber}</TableCell>
-                <TableCell>{permit.course}</TableCell>
+                <TableCell className="font-medium">{permit.studentNumber}</TableCell>
+                <TableCell>{permit.enrolledCourseUnit}</TableCell>
                 <TableCell>
                   <StatusBadge status={permit.status} />
                 </TableCell>
                 <TableCell>{permit.approvedBy}</TableCell>
-                <TableCell>{permit.examRoom}</TableCell>
               </TableRow>
             ))
           )}
