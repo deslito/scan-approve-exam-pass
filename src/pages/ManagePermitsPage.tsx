@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Filter, Plus, Calendar } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +13,7 @@ const ManagePermitsPage = () => {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Mock data
+  // Enhanced mock data with invigilator information
   const permits = [
     {
       id: "P001",
@@ -22,6 +23,9 @@ const ManagePermitsPage = () => {
       course: "Advanced Mathematics",
       status: "valid",
       expiryDate: "2023-06-15",
+      approvedBy: "Dr. John Doe",
+      approvedTime: "2023-05-10 10:30 AM",
+      examRoom: "Block A, Room 203"
     },
     {
       id: "P002",
@@ -31,6 +35,9 @@ const ManagePermitsPage = () => {
       course: "Physics 101",
       status: "pending",
       expiryDate: "2023-06-18",
+      approvedBy: "Prof. Sarah Williams",
+      approvedTime: "2023-05-11 09:15 AM",
+      examRoom: "Block B, Room 105"
     },
     {
       id: "P003",
@@ -40,6 +47,9 @@ const ManagePermitsPage = () => {
       course: "Computer Science",
       status: "expired",
       expiryDate: "2023-05-30",
+      approvedBy: "Dr. Michael Brown",
+      approvedTime: "2023-05-12 11:45 AM",
+      examRoom: "Block C, Room 301"
     },
     {
       id: "P004",
@@ -49,6 +59,9 @@ const ManagePermitsPage = () => {
       course: "Biology",
       status: "valid",
       expiryDate: "2023-06-20",
+      approvedBy: "Prof. Elizabeth Taylor",
+      approvedTime: "2023-05-13 14:20 PM",
+      examRoom: "Block A, Room 205"
     },
   ];
 
@@ -57,7 +70,8 @@ const ManagePermitsPage = () => {
     (permit) =>
       permit.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       permit.regNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      permit.course.toLowerCase().includes(searchTerm.toLowerCase())
+      permit.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      permit.approvedBy.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -68,7 +82,7 @@ const ManagePermitsPage = () => {
         <div className="p-4">
           <div className="bg-university-blue text-white p-6 pt-8">
             <h1 className="text-2xl font-bold">Manage Permits</h1>
-            <p className="opacity-90 font-medium">View and manage student examination permits</p>
+            <p className="opacity-90 font-medium">View approved student examination permits</p>
           </div>
 
           {/* Main Content */}
@@ -79,7 +93,7 @@ const ManagePermitsPage = () => {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search permits..."
+                  placeholder="Search permits or invigilators..."
                   className="pl-8"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -87,9 +101,6 @@ const ManagePermitsPage = () => {
               </div>
               <Button variant="outline" size="icon">
                 <Filter className="h-4 w-4" />
-              </Button>
-              <Button size="icon">
-                <Plus className="h-4 w-4" />
               </Button>
             </div>
 
@@ -145,7 +156,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-// Permits table component
+// Permits table component with invigilator information
 interface Permit {
   id: string;
   studentId: string;
@@ -154,6 +165,9 @@ interface Permit {
   course: string;
   status: string;
   expiryDate: string;
+  approvedBy: string;
+  approvedTime: string;
+  examRoom: string;
 }
 
 const PermitsTable = ({ permits }: { permits: Permit[] }) => {
@@ -166,29 +180,28 @@ const PermitsTable = ({ permits }: { permits: Permit[] }) => {
             <TableHead>Reg Number</TableHead>
             <TableHead>Course</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Expiry</TableHead>
+            <TableHead>Approved By</TableHead>
+            <TableHead>Exam Room</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {permits.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-4">
+              <TableCell colSpan={6} className="text-center py-4">
                 No permits found.
               </TableCell>
             </TableRow>
           ) : (
             permits.map((permit) => (
-              <TableRow key={permit.id} className="hover:bg-muted/50 cursor-pointer">
+              <TableRow key={permit.id} className="hover:bg-muted/50">
                 <TableCell className="font-medium">{permit.studentName}</TableCell>
                 <TableCell>{permit.regNumber}</TableCell>
                 <TableCell>{permit.course}</TableCell>
                 <TableCell>
                   <StatusBadge status={permit.status} />
                 </TableCell>
-                <TableCell className="flex items-center gap-1">
-                  <Calendar className="h-3 w-3 text-muted-foreground" />
-                  {new Date(permit.expiryDate).toLocaleDateString()}
-                </TableCell>
+                <TableCell>{permit.approvedBy}</TableCell>
+                <TableCell>{permit.examRoom}</TableCell>
               </TableRow>
             ))
           )}
